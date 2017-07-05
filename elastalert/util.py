@@ -114,12 +114,14 @@ def ts_to_dt(timestamp):
     return dt
 
 
-def dt_to_ts(dt):
+def dt_to_ts(dt, only_seconds=False):
     if not isinstance(dt, datetime.datetime):
         logging.warning('Expected datetime, got %s' % (type(dt)))
         return dt
     ts = dt.isoformat()
     # Round microseconds to milliseconds
+    if only_seconds:
+        ts = ts.split('.')[0] + '.000'
     if dt.tzinfo is None:
         # Implicitly convert local times to UTC
         return ts + 'Z'

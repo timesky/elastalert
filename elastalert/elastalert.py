@@ -183,8 +183,8 @@ class ElastAlerter():
         :param sort: If true, sort results by timestamp. (Default True)
         :return: A query dictionary to pass to Elasticsearch.
         """
-        starttime = to_ts_func(starttime)
-        endtime = to_ts_func(endtime)
+        starttime = to_ts_func(starttime, only_seconds=True)
+        endtime = to_ts_func(endtime, only_seconds=True)
         filters = copy.copy(filters)
         es_filters = {'filter': {'bool': {'must': filters}}}
         if starttime and endtime:
@@ -333,6 +333,9 @@ class ElastAlerter():
             extra_args = {}
 
         try:
+            if self.debug:
+                elastalert_logger.info('Query get_hits %s', query)
+
             if scroll:
                 res = self.current_es.scroll(scroll_id=rule['scroll_id'], scroll=scroll_keepalive)
             else:
@@ -484,6 +487,8 @@ class ElastAlerter():
         if term_size is None:
             term_size = rule.get('terms_size', 50)
         query = self.get_aggregation_query(base_query, rule, query_key, term_size, rule['timestamp_field'])
+        if self.debug:
+            elastalert_logger.info('Query get_hits_aggregation %s', query)
         try:
             if not rule['five']:
                 res = self.current_es.search(

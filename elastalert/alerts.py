@@ -446,6 +446,7 @@ class EmailAlerter(Alerter):
             if qk:
                 subject += ' - %s' % (qk)
 
+        subject += ' - %s' % (pretty_ts(matches[0][self.rule['timestamp_field']]))
         return subject
 
     def get_info(self):
